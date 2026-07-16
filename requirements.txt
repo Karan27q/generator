@@ -1,0 +1,8 @@
+gradio
+huggingface_hub
+gradio_client
+python-dotenv
+requests
+pillow
+numpy
+opencv-python

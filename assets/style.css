@@ -1,0 +1,21 @@
+.gradio-container {
+    max-width: 1100px !important;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+button.primary {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6) !important;
+    border: none !important;
+}
+
+footer {
+    visibility: hidden;
+}

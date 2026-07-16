@@ -1,0 +1,74 @@
+[
+  {
+    "time": "2026-07-16T17:46:50",
+    "prompt": "football staadium with fans in ecentric mode",
+    "type": "text-image",
+    "output": "outputs/images/image_20260716_174650.png",
+    "style": "None"
+  },
+  {
+    "time": "2026-07-16T11:33:57",
+    "prompt": "look like sliding",
+    "type": "image-video",
+    "output": "outputs/videos/video_20260716_113357.mp4"
+  },
+  {
+    "time": "2026-07-16T11:29:48",
+    "prompt": "throw the ball",
+    "type": "image-video",
+    "output": "outputs/videos/video_20260716_112948.mp4"
+  },
+  {
+    "time": "2026-07-16T11:10:25",
+    "prompt": "city sunset watched on top of a car",
+    "type": "text-image",
+    "output": "outputs/images/image_20260716_111024.png",
+    "style": "None"
+  },
+  {
+    "time": "2026-07-15T21:01:01",
+    "prompt": "Ronaldo doing Siu",
+    "type": "text-image",
+    "output": "outputs/images/image_20260715_210101.png",
+    "style": "None"
+  },
+  {
+    "time": "2026-07-15T19:35:50",
+    "prompt": "Portrait of a robot barista in a cyberpunk caf\u00e9",
+    "type": "text-image",
+    "output": "outputs/images/image_20260715_193549.png",
+    "style": "None"
+  },
+  {
+    "time": "2026-07-15T21:02:14",
+    "prompt": "snake eating human",
+    "type": "text-image",
+    "output": "outputs/images/image_20260715_210213.png",
+    "style": "None"
+  },
+  {
+    "time": "2026-07-16T11:29:36",
+    "prompt": "a cat walking",
+    "type": "text-video",
+    "output": "outputs/videos/video_20260716_112936.mp4"
+  },
+  {
+    "time": "2026-07-16T11:33:40",
+    "prompt": "a cat walking in burj khalifa",
+    "type": "text-video",
+    "output": "outputs/videos/video_20260716_113340.mp4"
+  },
+  {
+    "time": "2026-07-16T12:13:22",
+    "prompt": "a futuristic city with flying cars and people on top of it",
+    "type": "text-image",
+    "output": "outputs/images/image_20260716_121322.png",
+    "style": "Fantasy"
+  },
+  {
+    "time": "2026-07-16T18:00:37",
+    "prompt": "change red to green",
+    "type": "image-image",
+    "output": "outputs/images/image_20260716_180037.png"
+  }
+]
