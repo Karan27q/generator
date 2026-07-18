@@ -22,10 +22,18 @@ def _download_video(result) -> bytes:
     if isinstance(result, (bytes, bytearray)):
         return bytes(result)
 
-    if isinstance(result, dict) and "video" in result:
-        return _download_video(result["video"])
+    if isinstance(result, dict):
+        if "video" in result:
+            return _download_video(result["video"])
+        if "path" in result:
+            return _download_video(result["path"])
 
     if isinstance(result, str):
+        if result.startswith(("http://", "https://")):
+            import requests
+            resp = requests.get(result)
+            resp.raise_for_status()
+            return resp.content
         path = Path(result)
         if path.exists():
             return path.read_bytes()
@@ -35,6 +43,25 @@ def _download_video(result) -> bytes:
         return _download_video(result[0])
 
     raise RuntimeError(f"Unexpected video response type: {type(result)}")
+
+
+def _is_valid_video(val) -> bool:
+    if not val:
+        return False
+    if isinstance(val, str):
+        return True
+    if isinstance(val, dict):
+        if "__type__" in val:
+            if val["__type__"] == "update":
+                nested_val = val.get("value")
+                if nested_val:
+                    return _is_valid_video(nested_val)
+                return False
+        if "video" in val and val["video"]:
+            return _is_valid_video(val["video"])
+        if "path" in val and val["path"]:
+            return True
+    return False
 
 
 def _provider_cogvideox(prompt: str) -> str:
@@ -88,9 +115,12 @@ def _provider_wan(prompt: str) -> str:
 
         generated_video = result[0] if isinstance(result, tuple) else result
 
-        if generated_video:
+        if _is_valid_video(generated_video):
             logger.info("Wan generation finished after %ss", waited)
-            video_bytes = _download_video(generated_video)
+            actual_video = generated_video
+            if isinstance(generated_video, dict) and generated_video.get("__type__") == "update":
+                actual_video = generated_video.get("value", generated_video)
+            video_bytes = _download_video(actual_video)
             return save_output(video_bytes, "video")
 
         logger.info("Wan still generating... (%ss elapsed)", waited)
@@ -128,10 +158,11 @@ def _provider_ltx(prompt: str) -> str:
 
 
 PROVIDERS = [
-    _provider_cogvideox,
-    _provider_wan,
     _provider_ltx,
+    _provider_wan,
+    _provider_cogvideox,
 ]
+
 
 
 def generate_video(prompt: str) -> str:

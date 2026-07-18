@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PIL import Image
+from gradio_client import handle_file
 
 from services.config import (
     DEFAULT_IMG2IMG_MODEL,
@@ -55,7 +56,7 @@ def _provider_hf_space(image, prompt: str) -> Image.Image:
     try:
         logger.info("Calling HF Space %s...", IMG2IMG_SPACE)
         result = client.predict(
-            tmp_path,
+            handle_file(tmp_path),
             prompt,
             50,
             "Randomize Seed",
@@ -70,6 +71,13 @@ def _provider_hf_space(image, prompt: str) -> Image.Image:
 
     if isinstance(result, str) and Path(result).exists():
         return Image.open(result).convert("RGB")
+    if isinstance(result, tuple) and len(result) >= 4:
+        img_val = result[3]
+        if isinstance(img_val, str):
+            return Image.open(img_val).convert("RGB")
+        if isinstance(img_val, dict) and "path" in img_val:
+            return Image.open(img_val["path"]).convert("RGB")
+        return to_pil_image(img_val)
     if isinstance(result, tuple) and result:
         first = result[0]
         if isinstance(first, str):
@@ -80,9 +88,10 @@ def _provider_hf_space(image, prompt: str) -> Image.Image:
     raise RuntimeError(f"Unexpected Space response type: {type(result)}")
 
 
+
 PROVIDERS = [
-    _provider_hf_inference,   # primary — documented, working path via FLUX.2-dev
-    _provider_hf_space,       # fallback — still needs view_api() verification before trusting
+    _provider_hf_space,       # primary — free HF Space (instruct-pix2pix)
+    _provider_hf_inference,   # fallback — paid HF Inference via fal-ai
 ]
 
 

@@ -21,3 +21,4 @@ outputs/videos/*
 !outputs/images/.gitkeep
 !outputs/videos/.gitkeep
 !outputs/history.json
+task.md

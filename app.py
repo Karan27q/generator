@@ -220,4 +220,9 @@ def build_app() -> gr.Blocks:
 
 if __name__ == "__main__":
     demo = build_app()
-    demo.launch(css=css, theme=gr.themes.Soft())
+    demo.launch(
+        css=css,
+        theme=gr.themes.Soft(),
+        server_name="0.0.0.0",
+        server_port=7860,
+    )
