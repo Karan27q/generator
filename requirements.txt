@@ -1,5 +1,6 @@
 gradio
 huggingface_hub
+asgiref
 gradio_client
 python-dotenv
 requests

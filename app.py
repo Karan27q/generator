@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import gradio as gr
+from asgiref.wsgi import AsgiToWsgi
 from fastapi import FastAPI
 
 from services.image_to_image import transform_image
@@ -230,7 +231,8 @@ def create_fastapi_app() -> FastAPI:
     )
 
 
-app = create_fastapi_app()
+asgi_app = create_fastapi_app()
+app = AsgiToWsgi(asgi_app)
 application = app
 
 
