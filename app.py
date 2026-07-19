@@ -231,6 +231,7 @@ def create_fastapi_app() -> FastAPI:
 
 
 app = create_fastapi_app()
+application = app
 
 
 if __name__ == "__main__":
