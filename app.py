@@ -1,6 +1,7 @@
 """AI Creative Studio — Gradio UI entry point."""
 
 import asyncio
+import os
 from http import HTTPStatus
 from pathlib import Path
 
@@ -22,6 +23,15 @@ CSS_PATH = PROJECT_ROOT / "assets" / "style.css"
 ensure_output_dirs()
 
 css = CSS_PATH.read_text(encoding="utf-8") if CSS_PATH.exists() else ""
+
+
+def should_show_history() -> bool:
+    show_history = os.getenv("SHOW_HISTORY", "").strip().lower()
+    if show_history in {"1", "true", "yes", "on"}:
+        return True
+    if show_history in {"0", "false", "no", "off"}:
+        return False
+    return os.getenv("RENDER", "").lower() != "true"
 
 
 def _refresh_history():
@@ -195,16 +205,19 @@ def build_app() -> gr.Blocks:
                     i2v_download = gr.DownloadButton("Download Video", visible=False)
                     i2v_error = gr.Textbox(label="Error", visible=False, interactive=False)
 
-        with gr.Tab("History"):
-            gr.Markdown("Recent generations from this session and past runs.")
-            history_table = gr.Dataframe(
-                headers=["Time", "Type", "Prompt", "Output"],
-                value=_refresh_history(),
-                interactive=False,
-                wrap=True,
-            )
-            refresh_btn = gr.Button("Refresh History")
-            refresh_btn.click(fn=_refresh_history, outputs=[history_table])
+        if should_show_history():
+            with gr.Tab("History"):
+                gr.Markdown("Recent generations from this session and past runs.")
+                history_table = gr.Dataframe(
+                    headers=["Time", "Type", "Prompt", "Output"],
+                    value=_refresh_history(),
+                    interactive=False,
+                    wrap=True,
+                )
+                refresh_btn = gr.Button("Refresh History")
+                refresh_btn.click(fn=_refresh_history, outputs=[history_table])
+        else:
+            history_table = None
 
         t2i_outputs = [t2i_output, t2i_download, t2i_error, history_table]
         _wire_generate(t2i_btn, _run_text_to_image, [t2i_prompt, t2i_style], t2i_outputs)
