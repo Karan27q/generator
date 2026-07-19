@@ -46,6 +46,10 @@ def _enable_btn():
     return gr.update(interactive=True)
 
 
+def _clear_error():
+    return gr.update(value="", visible=False)
+
+
 def _run_text_to_image(prompt, style):
     try:
         image, path = generate_image(prompt, style)
@@ -124,6 +128,10 @@ def _wire_generate(btn, fn, inputs, outputs):
     """Wire a generate button with loading state and history refresh."""
     valid_outputs = [item for item in outputs if item is not None]
     btn.click(_disable_btn, outputs=[btn], queue=False).then(
+        _clear_error,
+        outputs=[outputs[-2]],
+        queue=False,
+    ).then(
         fn,
         inputs=inputs,
         outputs=valid_outputs,

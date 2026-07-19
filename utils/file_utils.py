@@ -51,13 +51,28 @@ def save_output(
     return str(path.relative_to(PROJECT_ROOT)).replace("\\", "/")
 
 
+def validate_prompt(prompt) -> str:
+    """Validate prompt input and return a trimmed prompt."""
+    if prompt is None:
+        raise ValueError("Prompt is required.")
+
+    prompt = str(prompt).strip()
+    if not prompt:
+        raise ValueError("Prompt is required.")
+    return prompt
+
+
 def validate_image(file) -> bool:
     """Check file type, size, and basic corruption before sending to a service."""
     if file is None:
         return False
 
     if isinstance(file, Image.Image):
-        return True
+        try:
+            file.verify()
+            return True
+        except Exception:
+            return False
 
     if isinstance(file, str):
         path = Path(file)

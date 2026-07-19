@@ -4,7 +4,7 @@ from PIL import Image
 
 from services.config import DEFAULT_IMAGE_MODEL, get_inference_client, get_text_to_image_model_candidates
 from services.prompts import build_prompt
-from utils.file_utils import save_output
+from utils.file_utils import save_output, validate_prompt
 from utils.history import add_entry
 from utils.logger import get_logger
 
@@ -13,11 +13,10 @@ logger = get_logger(__name__)
 
 def generate_image(prompt: str, style: str | None = None) -> tuple[Image.Image, str]:
     """Generate an image from a text prompt using HF Inference API."""
-    if not prompt or not prompt.strip():
-        raise ValueError("Prompt is required.")
+    prompt = validate_prompt(prompt)
 
     style = style or "None"
-    full_prompt = build_prompt(prompt.strip(), style)
+    full_prompt = build_prompt(prompt, style)
     logger.info("Generating image with prompt: %s", full_prompt[:100])
 
     client = get_inference_client()
@@ -43,7 +42,7 @@ def generate_image(prompt: str, style: str | None = None) -> tuple[Image.Image, 
 
     add_entry({
         "time": datetime.now().isoformat(timespec="seconds"),
-        "prompt": prompt.strip(),
+        "prompt": prompt,
         "type": "text-image",
         "output": output_path,
         "style": style,

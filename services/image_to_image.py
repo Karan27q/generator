@@ -13,7 +13,7 @@ from services.config import (
     IMG2IMG_SPACE,
     get_space_client,
 )
-from utils.file_utils import save_output, to_pil_image, validate_image
+from utils.file_utils import save_output, to_pil_image, validate_image, validate_prompt
 from utils.history import add_entry
 from utils.logger import get_logger
 
@@ -99,10 +99,8 @@ def transform_image(image, prompt: str) -> tuple[Image.Image, str]:
     """Transform an image using a provider priority chain."""
     if not validate_image(image):
         raise ValueError("Invalid or missing image upload.")
-    if not prompt or not prompt.strip():
-        raise ValueError("Prompt is required.")
 
-    prompt = prompt.strip()
+    prompt = validate_prompt(prompt)
     logger.info("Starting image-to-image: %s", prompt[:80])
 
     last_error: Exception | None = None
