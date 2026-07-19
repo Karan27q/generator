@@ -2,7 +2,7 @@ from datetime import datetime
 
 from PIL import Image
 
-from services.config import DEFAULT_IMAGE_MODEL, get_inference_client
+from services.config import DEFAULT_IMAGE_MODEL, get_inference_client, get_text_to_image_model_candidates
 from services.prompts import build_prompt
 from utils.file_utils import save_output
 from utils.history import add_entry
@@ -21,9 +21,20 @@ def generate_image(prompt: str, style: str | None = None) -> tuple[Image.Image, 
     logger.info("Generating image with prompt: %s", full_prompt[:100])
 
     client = get_inference_client()
-    logger.info("Calling HF Inference API (model=%s)...", DEFAULT_IMAGE_MODEL)
+    model_candidates = get_text_to_image_model_candidates()
+    last_error = None
 
-    image = client.text_to_image(full_prompt, model=DEFAULT_IMAGE_MODEL)
+    for model_name in model_candidates:
+        try:
+            logger.info("Calling HF Inference API (model=%s)...", model_name)
+            image = client.text_to_image(full_prompt, model=model_name)
+            break
+        except Exception as exc:  # pragma: no cover - runtime fallback path
+            last_error = exc
+            logger.warning("Model %s failed: %s", model_name, exc)
+    else:
+        raise RuntimeError(f"All text-to-image fallback models failed. Last error: {last_error}")
+
     if not isinstance(image, Image.Image):
         image = Image.open(image)
 

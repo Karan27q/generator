@@ -16,6 +16,12 @@ DEFAULT_IMG2IMG_MODEL = "black-forest-labs/FLUX.2-dev"
 DEFAULT_IMG2IMG_PROVIDER = "fal-ai"   # also available: "replicate", "wavespeed"
 DEFAULT_STYLE = "None"
 
+FREE_IMAGE_MODELS = [
+    "black-forest-labs/FLUX.1-schnell",
+    "stabilityai/stable-diffusion-2-1-base",
+    "runwayml/stable-diffusion-v1-5",
+]
+
 # Hugging Face Spaces — verified with Client(<id>).view_api()
 COGVIDEOX_SPACE = "THUDM/CogVideoX-5B-Space"   # confirmed working
 WAN_SPACE = "Wan-AI/Wan2.1"                     # was wrong: "Wan-AI/Wan2.1-T2V-1.3B" is a model repo, not a Space
@@ -30,6 +36,10 @@ def get_inference_client() -> InferenceClient:
             "HF_TOKEN is not set. Add your Hugging Face token to .env"
         )
     return InferenceClient(token=HF_TOKEN)
+
+
+def get_text_to_image_model_candidates() -> list[str]:
+    return list(FREE_IMAGE_MODELS)
 
 
 @lru_cache(maxsize=8)
