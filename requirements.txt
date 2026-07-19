@@ -6,3 +6,6 @@ requests
 pillow
 numpy
 opencv-python
+gunicorn
+uvicorn
+fastapi

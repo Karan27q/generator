@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import gradio as gr
+from fastapi import FastAPI
 
 from services.image_to_image import transform_image
 from services.image_to_video import animate_image
@@ -216,6 +217,20 @@ def build_app() -> gr.Blocks:
         _wire_generate(i2v_btn, _run_image_to_video, [i2v_input, i2v_prompt], i2v_outputs)
 
     return app
+
+
+def create_fastapi_app() -> FastAPI:
+    demo = build_app()
+    return gr.mount_gradio_app(
+        FastAPI(title="AI Creative Studio"),
+        demo,
+        path="/",
+        css=css,
+        theme=gr.themes.Soft(),
+    )
+
+
+app = create_fastapi_app()
 
 
 if __name__ == "__main__":
