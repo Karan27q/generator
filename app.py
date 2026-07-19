@@ -122,10 +122,11 @@ def _run_image_to_video(image, prompt):
 
 def _wire_generate(btn, fn, inputs, outputs):
     """Wire a generate button with loading state and history refresh."""
+    valid_outputs = [item for item in outputs if item is not None]
     btn.click(_disable_btn, outputs=[btn], queue=False).then(
         fn,
         inputs=inputs,
-        outputs=outputs,
+        outputs=valid_outputs,
     ).then(_enable_btn, outputs=[btn], queue=False)
 
 
