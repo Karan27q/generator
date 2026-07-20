@@ -27,6 +27,12 @@ def friendly_error(exc: Exception) -> str:
     if "all providers failed" in msg:
         return "All generation providers failed. Try again later or check your API token."
 
+    if "zerogpu" in msg or "gpu time" in msg or "hugging face pro" in msg:
+        return "You have exceeded your Hugging Face ZeroGPU quota limit. Please wait a while for it to reset or check your account."
+
+    if "shutdown" in msg and "futures" in msg:
+        return "A connection error occurred. Please try generating again."
+
     if "space" in msg and ("sleep" in msg or "offline" in msg or "building" in msg):
         return "The Hugging Face Space is waking up or offline. Please try again shortly."
 

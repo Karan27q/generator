@@ -2,7 +2,6 @@
 
 import asyncio
 import os
-from http import HTTPStatus
 from pathlib import Path
 
 import gradio as gr
@@ -254,96 +253,8 @@ def create_fastapi_app() -> FastAPI:
     )
 
 
-class AsgiToWsgi:
-    def __init__(self, asgi_app):
-        self.asgi_app = asgi_app
-
-    def __call__(self, environ, start_response):
-        method = environ.get("REQUEST_METHOD", "GET")
-        path = environ.get("PATH_INFO", "/")
-        query_string = environ.get("QUERY_STRING", "")
-        content_length = environ.get("CONTENT_LENGTH", "")
-        body = b""
-
-        if content_length:
-            try:
-                body = environ["wsgi.input"].read(int(content_length))
-            except (TypeError, ValueError):
-                body = b""
-
-        async def receive():
-            if not hasattr(receive, "called"):
-                receive.called = True
-                return {"type": "http.request", "body": body, "more_body": False}
-            return {"type": "http.disconnect"}
-
-        response_status = 500
-        response_headers = []
-        response_body_chunks = []
-
-        async def send(message):
-            nonlocal response_status, response_headers, response_body_chunks
-            if message["type"] == "http.response.start":
-                response_status = message["status"]
-                response_headers = [
-                    (
-                        key.decode("latin-1") if isinstance(key, bytes) else key,
-                        value.decode("latin-1") if isinstance(value, bytes) else value,
-                    )
-                    for key, value in message.get("headers", [])
-                ]
-            elif message["type"] == "http.response.body":
-                if message.get("body"):
-                    response_body_chunks.append(message["body"])
-
-        scope = {
-            "type": "http",
-            "asgi": {"version": "3.0", "spec_version": "2.3"},
-            "http_version": environ.get("SERVER_PROTOCOL", "HTTP/1.1"),
-            "method": method,
-            "scheme": environ.get("wsgi.url_scheme", "http"),
-            "path": path,
-            "raw_path": path.encode("utf-8"),
-            "query_string": query_string.encode("utf-8"),
-            "headers": [
-                (key.lower().encode("latin-1"), value.encode("latin-1"))
-                for key, value in environ.get("HTTP_HEADERS", {}).items()
-            ],
-            "client": (environ.get("REMOTE_ADDR", "127.0.0.1"), 0),
-            "server": (environ.get("SERVER_NAME", "localhost"), int(environ.get("SERVER_PORT", "80"))),
-            "root_path": "",
-        }
-
-        scope["headers"] = [
-            (key.encode("latin-1") if isinstance(key, str) else key, value.encode("latin-1") if isinstance(value, str) else value)
-            for key, value in [
-                (key, value)
-                for key, value in environ.items()
-                if key.startswith("HTTP_")
-            ]
-        ]
-        scope["headers"].extend(
-            [
-                (b"host", environ.get("HTTP_HOST", "localhost").encode("latin-1")),
-                (b"content-length", str(len(body)).encode("latin-1")),
-                (b"content-type", environ.get("CONTENT_TYPE", "").encode("latin-1")),
-            ]
-        )
-
-        asyncio.run(self.asgi_app(scope, receive, send))
-
-        status_text = f"{response_status} {HTTPStatus(response_status).phrase}" if response_status in HTTPStatus._value2member_map_ else f"{response_status} OK"
-        if method == "HEAD":
-            response_body = b""
-        else:
-            response_body = b"".join(response_body_chunks)
-
-        start_response(status_text, response_headers)
-        return [response_body]
-
-
-asgi_app = create_fastapi_app()
-app = AsgiToWsgi(asgi_app)
+app = create_fastapi_app()
+asgi_app = app
 application = app
 
 
