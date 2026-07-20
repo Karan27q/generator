@@ -3,6 +3,7 @@
 import asyncio
 import os
 from pathlib import Path
+from a2wsgi import ASGIMiddleware
 
 import gradio as gr
 from fastapi import FastAPI
@@ -253,8 +254,8 @@ def create_fastapi_app() -> FastAPI:
     )
 
 
-app = create_fastapi_app()
-asgi_app = app
+asgi_app = create_fastapi_app()
+app = ASGIMiddleware(asgi_app)
 application = app
 
 

@@ -10,3 +10,5 @@ opencv-python
 gunicorn
 uvicorn
 fastapi
+a2wsgi
+
